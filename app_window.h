@@ -1,4 +1,3 @@
-
 // Ensure the header file is included only once in multi-file projects
 #ifndef APP_WINDOW_H
 #define APP_WINDOW_H

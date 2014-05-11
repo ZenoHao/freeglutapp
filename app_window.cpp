@@ -47,7 +47,7 @@ void AppWindow::handle ( const Event& e )
       rd=false; // no need to redraw
     }
 
-   if ( e.type==SpecialKey )
+   if ( e.type==SpecialKey ){
     switch ( e.key )
     { case GLUT_KEY_LEFT:  
     std::cout << "Key Left Pressed.\n";
