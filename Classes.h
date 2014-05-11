@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -36,6 +37,7 @@ class Square{
             centerY = y;
         }
         void draw(){
+            renderString();
             glColor3f(1,1,1);
             glBegin(GL_POLYGON);
             glVertex2d(centerX - 0.25, centerY + 0.25);
@@ -44,13 +46,12 @@ class Square{
             glVertex2d(centerX - 0.25, centerY -0.25);
             glEnd();
         }
-        void renderString(void *font) {
+        void renderString() {
             char buffer[256];
-            
             sprintf(buffer,"%d", val);
-            glColor3f(1, 1, 1); 
+            glColor3f(0, 1, 1); 
             glRasterPos2f(centerX, centerY);
-            glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>("Hello!"));
+            glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(buffer));
         }
         void move(int m){
             switch (m){

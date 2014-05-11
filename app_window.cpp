@@ -51,15 +51,19 @@ void AppWindow::handle ( const Event& e )
     switch ( e.key )
     { case GLUT_KEY_LEFT:  
     std::cout << "Key Left Pressed.\n";
+	s.move(LEFT);
     break;
       case GLUT_KEY_RIGHT: 
     std::cout << "Key Right Pressed.\n"; 
+	s.move(RIGHT);
     break;
       case GLUT_KEY_UP:    
     std::cout << "Key Up Pressed.\n";
+	s.move(UP);
     break; 
       case GLUT_KEY_DOWN:
     std::cout << "Key Down Pressed.\n";  
+	s.move(DOWN);
     break;
       default: rd=false; // no redraw
             std::cout << "Space pressed.\n";
@@ -96,7 +100,7 @@ void AppWindow::draw ()
    glMatrixMode( GL_MODELVIEW );
    glLoadIdentity();
    s.draw();
-   s.renderString(GLUT_BITMAP_TIMES_ROMAN_24);
+   s.renderString();
    // Set drawing color to yellow
    // Swap buffers
    glFlush();         // flush the pipeline (usually not necessary)
