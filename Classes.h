@@ -37,6 +37,7 @@ class Square{
             centerY = y;
         }
         void draw(){
+		if(val > 0){
             renderString();
             glColor3f(1,1,1);
             glBegin(GL_POLYGON);
@@ -45,6 +46,7 @@ class Square{
             glVertex2d(centerX + 0.25, centerY - 0.25);
             glVertex2d(centerX - 0.25, centerY -0.25);
             glEnd();
+		}
         }
         void renderString() {
             char buffer[256];
@@ -74,8 +76,11 @@ class Square{
         }
         
         bool equals(Square s){
-            return this->val == s.getVal();
+            return (this->val == s.getVal());
         }
+	bool operator ==(Square &s){
+		return (this->val == s.getVal());
+	}
 };
 
 class Field{
@@ -84,7 +89,13 @@ class Field{
     Square container[4][4];
     public:
     Field(){}
-    
+    void initialize(){
+	// to initialize the field, add one randomly generated square.
+   	srand(time(NULL));
+	int x = rand()%4;
+	int y = rand()%4;
+	container[y][x] = Square(2,y*0.25,x*0.25);
+	}
     bool createSquare () {
         srand(time(NULL));
    	return 0;
@@ -93,10 +104,10 @@ class Field{
         int v_i = i;
         int h_j = j;
         for(int k = 0; i < 4; i++){
-            if(container[i][j].equals(container[k][j]) && k != i){
+            if(container[i][j] == (container[k][j]) && k != i){
                 return true;
             }
-            if(container[i][j].equals(container[i][k]) && k != j){
+            if(container[i][j] == (container[i][k]) && k != j){
                 return true;
             }
         }
@@ -115,6 +126,23 @@ class Field{
         }
     }
     void endGame(){}
-    
+	void draw(){
+		for(int i = 0; i < 4; i ++)
+			for(int j = 0; j < 4; j++)
+				container[i][j].draw();
+	}
+	void move(int input){
+		switch(input){
+		case UP:
+		break;
+		case RIGHT:
+		break;
+		case DOWN:
+		break;
+		case LEFT:
+		break;
+
+		}
+	}  
 };
 

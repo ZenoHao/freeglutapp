@@ -11,7 +11,7 @@ class AppWindow : public GlutWindow
     float _markx, _marky, _markx_prev, _marky_prev;
     int _w, _h;
     double _dx, _dy;
-    Square s;
+    Field f;
    public :
     AppWindow ( const char* label, int x, int y, int w, int h );
     void windowToScene ( float& x, float &y );
