@@ -11,6 +11,7 @@ using namespace std;
 class Square{
     private:
         int val;
+	float size;
         float centerX;
         float centerY;
         float r;
@@ -23,35 +24,32 @@ class Square{
             b = 0;
             g = 0;
         }
-        Square(float x, float y){
+        Square(float x, float y, float size){
             val = 0;
             centerX = x;
             centerY = y;
+		this -> size = size;
             r = 0;
             g = 0;
             b = 0;
-        }
-        Square(int v, float x, float y){
-            val = v;
-            centerX = x;
-            centerY = y;
         }
         void draw(){
 		if(val > 0){
             renderString();
             glColor3f(1,1,1);
             glBegin(GL_POLYGON);
-            glVertex2d(centerX - 0.25, centerY + 0.25);
-            glVertex2d(centerX + 0.25, centerY + 0.25);
-            glVertex2d(centerX + 0.25, centerY - 0.25);
-            glVertex2d(centerX - 0.25, centerY -0.25);
+		float offset = (size/2 - 0.04*size/2);
+            glVertex2d(centerX - offset, centerY + offset);
+            glVertex2d(centerX + offset, centerY + offset);
+            glVertex2d(centerX + offset, centerY - offset);
+            glVertex2d(centerX - offset, centerY - offset);
             glEnd();
 		}
         }
         void renderString() {
             char buffer[256];
             sprintf(buffer,"%d", val);
-            glColor3f(0, 1, 1); 
+            glColor3f(0, 0, 0); 
             glRasterPos2f(centerX, centerY);
             glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(buffer));
         }
@@ -74,48 +72,94 @@ class Square{
         int getVal(){
             return val;
         }
-        
+        void setVal(int val){
+		this->val = val;
+	}
         bool equals(Square s){
             return (this->val == s.getVal());
         }
 	bool operator ==(Square &s){
 		return (this->val == s.getVal());
 	}
+	void print(){
+		cout << "X: " << centerX << " Y: " << centerY << endl;
+	}
 };
 
 class Field{
 
     private:
-    Square container[4][4];
+	int size;
+    	vector<vector<Square*> > container;
     public:
-    Field(){}
-    void initialize(){
-	// to initialize the field, add one randomly generated square.
-   	srand(time(NULL));
-	int x = rand()%4;
-	int y = rand()%4;
-	container[y][x] = Square(2,y*0.25,x*0.25);
+	Field(){
+		size = 0;
+		container.clear();
 	}
-    bool createSquare () {
-        srand(time(NULL));
-   	return 0;
+	Field(int n){
+		size = n;
 	}
+	void initialize(){
+		for(int i = 0; i < size; i++){
+			vector<Square*> temp;
+			container.push_back(temp);
+			for(int j = 0; j < size; j++){
+				container[i].push_back(new Square(-1.+1./size + 2./size*j, 
+				1. - 1./size - 2./size*i, 2./size));
+			}	
+		}
+		cout << "SDLFJKSDLFJ " << endl;
+		for(int i = 0; i < size; i++)
+			for(int j = 0; j < size; j++)
+				container[i][j] -> print();
+		createSquare();	
+	}
+     bool createSquare () {
+        int number = 0;
+        //Checks for an empty square
+        bool empty = false;
+	srand(time(NULL));
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (container[i][j] -> getVal() == 0) {
+                    empty = true;    
+                }
+            }
+        }
+        //Gets a random number, either 2 or size
+        if (empty == true) {
+            while (number != 2 && number != size) {
+                number = (rand() % 3) + 2;
+            }
+            
+            //Sets the value to a random square
+            while (empty == true) {
+                int a = (rand() % size);
+                int b = (rand() % size);
+                if (container[a][b] -> getVal() == 0) { //makes sure the spot is empty
+                    container[a][b] -> setVal(number);
+		return true;
+                }
+            }
+        }
+        return false;
+    }
     bool checkSquare(int i , int j){
         int v_i = i;
         int h_j = j;
-        for(int k = 0; i < 4; i++){
-            if(container[i][j] == (container[k][j]) && k != i){
+        for(int k = 0; i < size; i++){
+            if(*(container[i][j]) == *(container[k][j]) && k != i){
                 return true;
             }
-            if(container[i][j] == (container[i][k]) && k != j){
+            if(*(container[i][j]) == *(container[i][k]) && k != j){
                 return true;
             }
         }
     }   
     bool checkMoveAvail(){
         bool anyMove = false;
-        for(int i = 0; i < 4; i++){
-            for(int j = 0; j < 4; j++){
+        for(int i = 0; i < size; i++){
+            for(int j = 0; j < size; j++){
                 if(checkSquare(i,j)) {
                     anyMove = true;
                 }
@@ -127,9 +171,9 @@ class Field{
     }
     void endGame(){}
 	void draw(){
-		for(int i = 0; i < 4; i ++)
-			for(int j = 0; j < 4; j++)
-				container[i][j].draw();
+		for(int i = 0; i < size; i ++)
+			for(int j = 0; j < size; j++)
+				container[i][j] -> draw();
 	}
 	void move(int input){
 		switch(input){
