@@ -1,8 +1,6 @@
 #include <iostream>
 #include "app_window.h"
-
-#define NUM_RECTS 3
-
+void display(void);
 AppWindow::AppWindow ( const char* label, int x, int y, int w, int h )
           :GlutWindow ( label, x, y, w, h )
  {
@@ -23,7 +21,6 @@ void AppWindow::windowToScene ( float& x, float &y )
    x = (2.0f*(x/float(_w))) - 1.0f;
    y = 1.0f - (2.0f*(y/float(_h)));
  }
-
 // Called every time there is a window event
 void AppWindow::handle ( const Event& e )
  {
@@ -32,14 +29,20 @@ void AppWindow::handle ( const Event& e )
    if ( e.type==Keyboard ){ 
     switch ( e.key )
     { case ' ': // space bar
-        std::cout << "Space pressed.\n";
-            _markx = 1.5;
-            _marky = 1.5;
             redraw();
         break;
     case 27: // Esc was pressed
         exit(1);
         break;
+	case 114:
+		f.mode("reset");
+	break;
+	case 121:
+		f.mode("yolo");
+	break;
+	case 110:
+		f.mode("noyolo");
+	break;
      }
     }
    if ( e.type==Menu )

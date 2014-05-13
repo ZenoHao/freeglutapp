@@ -1,9 +1,11 @@
+#include <unistd.h>
 #include <stdlib.h>
 #include <iostream>
 #include <algorithm>
 #include <vector>
 #include "glut_window.h"
 #include <math.h>   
+#include <string>
 #include <time.h>
 #include "Movement.h"
 using namespace std;
@@ -11,6 +13,8 @@ using namespace std;
 class Square{
     private:
         int val;
+	bool yolo;
+	int angle;
 	float size;
         float centerX;
         float centerY;
@@ -19,6 +23,7 @@ class Square{
         float b;
     public:
         Square(){
+		srand(time(NULL));
             val = 0;
             r = 0;
             b = 0;
@@ -37,74 +42,111 @@ class Square{
 		this -> val = s.val;
 	}
         void draw(){
+            	glPushMatrix();
+		if(yolo){
+			glRotatef(rand()*90,1,1,1);
+            		renderString();
+			glColor3f(r,g,b);
+	            	glBegin(GL_POLYGON);
+			float offset = (size/2 - 0.04*size/2);
+			glVertex2d(centerX - offset, centerY + offset);
+		        glVertex2d(centerX + offset, centerY + offset);
+       	     		glVertex2d(centerX + offset, centerY - offset);
+       	     		glVertex2d(centerX - offset, centerY - offset);
+			glEnd();
+       	     		glPopMatrix();
+		}
+		else{
 		if(val > 0){
-            renderString();
-            glColor3f(1,1,1);
-            glBegin(GL_POLYGON);
+            		renderString();
+		glColor3f(r,g,b);
+            	glBegin(GL_POLYGON);
 		float offset = (size/2 - 0.04*size/2);
-            glVertex2d(centerX - offset, centerY + offset);
-            glVertex2d(centerX + offset, centerY + offset);
-            glVertex2d(centerX + offset, centerY - offset);
-            glVertex2d(centerX - offset, centerY - offset);
-            glEnd();
+		glVertex2d(centerX - offset, centerY + offset);
+	        glVertex2d(centerX + offset, centerY + offset);
+            	glVertex2d(centerX + offset, centerY - offset);
+            	glVertex2d(centerX - offset, centerY - offset);
+		glEnd();
+            	glPopMatrix();
+		}
 		}
         }
         void renderString() {
-            char * buffer = new char[256];
-            sprintf(buffer,"%d", val);
-            glColor3f(0, 0, 0); 
-            glRasterPos2f(centerX-(0.005*sizeof(buffer)/sizeof(buffer[0])), centerY);
-            glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(buffer));
-        	delete buffer;
+            	char * buffer = new char[256];
+        	sprintf(buffer,"%d", val);
+         	glColor3f(0, 0, 0); 
+		glRasterPos2f(centerX-(0.005*sizeof(buffer)/sizeof(buffer[0])), centerY);
+		if(yolo){
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>("YOLO"));
+			r = static_cast<float>(rand())/static_cast<float>(RAND_MAX); 
+			g = static_cast<float>(rand())/static_cast<float>(RAND_MAX); 
+			b = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
+			for(int i = 0; i < 10; i ++){
+				glRasterPos2f(rand(), rand());
+				glColor3f(static_cast<float>(rand())/static_cast<float>(RAND_MAX),
+				static_cast<float>(rand())/static_cast<float>(RAND_MAX),
+				static_cast<float>(rand())/static_cast<float>(RAND_MAX));
+				glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>("YOLO"));
+			} 
+		}else{
+		glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(buffer));
+        	r = 1;
+		g = 1;
+		b = 1;
+		}delete buffer;
 	}
-        void move(int m){
-            switch (m){
-            case UP:
-            centerY = 0.75;
-            break;
-            case DOWN:
-            centerY = -0.75;
-            break;
-            case LEFT:
-            centerX = -0.75;
-            break;
-            case RIGHT:
-            centerX = 0.75;
-            break;
-            }
-        }
         int getVal(){
             return val;
         }
         void setVal(int val){
 		this->val = val;
 	}
+        double getSize(){
+            return size;
+        }
+        void setSize(double size){
+		this->size = size;
+	}
         bool equals(Square s){
             return (this->val == s.getVal());
         }
-	bool operator ==(Square &s){
-		return (this->val == s.getVal());
-	}
-	bool operator ==(int &val){
-		return (this -> val == val);
-	}
-	void print(){
-	}
+	void yoloyolo(){yolo = true;}
+	void noyolo(){yolo = false;}
 };
 
 class Field{
 
     private:
+	bool lose;
 	int size;
     	vector<vector<Square*> > container;
 	vector<vector<Square*> > buffer;
     public:
-	Field(){
-		size = 0;
-		container.clear();
-	}
-	Field(int n){
+	Field(int n = 0){
+		lose = false;
+		srand(time(NULL));
 		size = n;
+	}
+	void mode(string input){
+		if(input == "yolo")
+			for(int yolo1 = 0; yolo1 < size; yolo1++)
+				for(int yolo2 = 0; yolo2 < size; yolo2++)
+					container[yolo1][yolo2] -> yoloyolo();
+		if(input == "noyolo")
+			for(int yolo1 = 0; yolo1 < size; yolo1++)
+				for(int yolo2 = 0; yolo2 < size; yolo2++)
+					container[yolo1][yolo2] -> noyolo();
+		if(input == "reset"){
+			for(int i = 0; i < size; i++){
+				for(int j = 0; j < size; j++){
+					delete container[i][j];
+					delete buffer[i][j];
+				}
+			}
+			container.clear();
+			buffer.clear();
+			initialize();
+		}	
 	}
 	void initialize(){
 		for(int i = 0; i < size; i++){
@@ -118,16 +160,12 @@ class Field{
 				1. - 1./size - 2./size*i, 2./size));
 			}	
 		}
-		for(int i = 0; i < size; i++)
-			for(int j = 0; j < size; j++)
-				container[i][j] -> print();
 		createSquare();	
 	}
      bool createSquare () {
         int number = 0;
         //Checks for an empty square
         bool empty = false;
-	srand(time(NULL));
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (container[i][j] -> getVal() == 0) {
@@ -155,13 +193,14 @@ class Field{
     }
     bool checkSquare(int i , int j){
         for(int k = 0; i < size; i++){
-            if(*(container[i][j]) == *(container[k][j]) && k != i){
+            if(container[i][j]->equals(*container[k][j]) && k != i){
                 return true;
             }
-            if(*(container[i][j]) == *(container[i][k]) && k != j){
+            if(container[i][j]->equals(*container[i][k]) && k != j){
                 return true;
             }
         }
+	return false;
     }   
     bool checkMoveAvail(){
         bool anyMove = false;
@@ -172,13 +211,17 @@ class Field{
                 }
             }    
         }
-	return anyMove;
         if (anyMove == false && createSquare() == false) {
-            endGame();
+		endGame();
         }
+	else
+		return anyMove;
     }
     void endGame(){
-		cout << "YOU ARE BAD " << endl;		
+		cout << "LOOOOOOOOOOOSERRRRRRRRRRRRRRR" << endl; 
+		glColor3f(0, 0, 0); 
+		glRasterPos2f(rand()*2-1,rand()*2-1);
+        	glutBitmapString(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>("YOU ARE BAD"));
 	}
 	void draw(){
 		for(int i = 0; i < size; i ++)
@@ -334,8 +377,18 @@ class Field{
 				break;
 		}
 		if(diff)
-		createSquare();
-		checkMoveAvail();
+			createSquare();
+		else{
+			/*
+			for(int i = 0; i < size; i++){
+				for(int j = 0; j< size; j++){
+					container[i][j] -> setVal(buffer[i][j] -> getVal());
+				}
+			}
+			*/
+		}
+		if(!checkMoveAvail())
+			endGame();
 	}  
 };
 
