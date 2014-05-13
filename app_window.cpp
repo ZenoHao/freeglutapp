@@ -50,23 +50,18 @@ void AppWindow::handle ( const Event& e )
    if ( e.type==SpecialKey ){
     switch ( e.key )
     { case GLUT_KEY_LEFT:  
-		std::cout << "Key Left Pressed.\n";
 		f.move(LEFT);	
 	break;
 	case GLUT_KEY_RIGHT: 
-		std::cout << "Key Right Pressed.\n";
 		f.move(RIGHT); 
 	break;
 	case GLUT_KEY_UP:    
-		std::cout << "Key Up Pressed.\n";
 		f.move(UP);
 	break; 
 	case GLUT_KEY_DOWN:
-		std::cout << "Key Down Pressed.\n";  
 		f.move(DOWN);
 		break;
       	default: rd=false; // no redraw
-  	      std::cout << "Space pressed.\n";
 		redraw();
         break;
     case 27: // Esc was pressed
